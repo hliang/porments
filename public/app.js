@@ -68,11 +68,14 @@ console.log("img=" + randImgUrl);
 $.getJSON("/videos", function(data) {
   var maxvid = 20;
   // For each one
+  console.log("getjson /videos");
+  console.log(data);
   for (var i = 0; i < data.length && i < maxvid; i++) {
     // Display the apropos information on the page
     console.log(data[i]);
     var imgtag = $("<img>", {
-      src: data[i].details.thumbnail.indexOf('data:image') == 0 ? randImgUrl : data[i].details.thumbnail,
+      src: data[i].details.thumbnail.indexOf('data:image') == 0 ? randomImg() : data[i].details.thumbnail,
+      // src: data[i].details.thumbnail,
       // "data-pixelate": "",
       // "data-value": "0.1",
       // "data-reveal": true,
@@ -80,18 +83,18 @@ $.getJSON("/videos", function(data) {
     var atag = $("<a>", {
       text: data[i].title,
       class: "vidtitle",
-      href: "#", // data[i].link,
+      href: data[i].link,
     });
     
-    var divtag = $("<div class='vidcomment'/ >").text(" comments")
-    var addtag = $("<div class='addcomment' />").text("++");
+    var divtag = $("<button class='vidcomment'/ >").text(" notes");
+    var addtag = $("<button class='addcomment' />").text(" edit");
     var commenttag = $("<div>").append(divtag).append(addtag);
     // atag.append(imgtag);
     var litag = $("<li class='vidbox' />").append(imgtag).append(atag).append(commenttag);
     litag.attr("data-id", data[i]._id);
     // $("#videos-wrapper ul").append("<li><p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].link + "</p></li>");
     $("#videos-wrapper ul").append(litag);
-    $("[data-id=" + data[i]._id + "] img").pixelate({ value: 0.05, reveal: false });
+    $("[data-id=" + data[i]._id + "] img").pixelate({ value: 0.05, reveal: true });
     // $("[data-id=" + data[i]._id + "] img").foggy({
     //   blurRadius: 10,          // In pixels.
     //   opacity: 0.9,           // Falls back to a filter for IE.

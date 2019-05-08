@@ -42,41 +42,50 @@ app.get("/", function(req, res) {
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
+  console.log("app.get /scrape start scrapping");
   axios({
     method:'get',
-    url: "https://www.pornhub.com/video?page=1",
+    url: "https://www.tvguide.com/",
     headers: {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36'},
   }).then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
     // Now, we grab video within an #vidwoCategory tag, and do the following:
-    $("#videoCategory li").each(function(i, element) {
+    $(".section-content-list-item").each(function(i, element) {
       // Save an empty result object
       let result = {};
 
       // Add the text and href of every link, and save them as properties of the result object
-      result.vkey = $(this).attr("_vkey");
-      result.title = $(this).find(".thumbnail-info-wrapper .title a").text();
-      result.link = $(this).find(".thumbnail-info-wrapper .title a").attr("href");
+      result.title = $(this).find(".title").text();
+      result.link = $(this).find("a.link").attr("href");
+      console.log("========= " + i + " =========");
+      console.log("result.link=" + result.link + " result.title=" + result.title);
+      if (result.title == "") {
+        return null;
+      }
+      result.vkey = result.link.replace("https://www.tvguide.com/news/", "").replace("/", "");
       if (result.link.indexOf("/") === 0) {
-        result.link = "https://www.pornhub.com" + result.link 
+        result.link = "https://www.tvguide.com" + result.link 
       }
       let vidDetails = {
         "nviews": $(this).find(".videoDetailsBlock .views var").text(),
         "rating": $(this).find(".videoDetailsBlock .rating-container .value").text(),
-        "thumbnail": $(this).find(".phimage img").attr("src"),
+        // "thumbnail": $(this).find(".content-image-wrap img.content-image").attr("src"),
+        "thumbnail": $(this).find(".content-image-wrap img.content-image").attr("data-amp-src"),
         "tsCrawled": Date.now(), // time stamp -- number of milliseconds elapsed since January 1, 1970 00:00:00 UTC
       }
       result.details = vidDetails;
-      //console.log(result);
+      console.log(result);
       let query = {vkey: result.vkey};
       let update = result;
       let options = {upsert: true};
       db.VidInfo.findOneAndUpdate(query, update, options, function(err, doc, res){
         if (err) {
+          console.log('errrrrror');
           console.log(err);
         } else {
+          console.log('successs update');
           console.log(doc);
         }
       });
@@ -99,6 +108,7 @@ app.get("/scrape", function(req, res) {
 
 // A GET route for scraping the comments
 app.get("/scrape/:id", function(req, res) {
+  console.log("app.get /scrape/:id ");
   // First, we grab the body of the html with axios
   axios({
     method:'get',
@@ -158,6 +168,7 @@ app.get("/scrape/:id", function(req, res) {
 
 // Route for getting all Articles from the db
 app.get("/videos", function(req, res) {
+  console.log("app.get /videos ");
   // Grab every document in the Articles collection
   db.VidInfo.find({}).sort({ _id: 1 }).limit(40)
     .then(function(dbVidInfo) {
