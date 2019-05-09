@@ -1,11 +1,6 @@
 # porments
-comments for/from porn sites
 
-!!! NSFW !!!
+Scraping TV guide from internet, and you can add your comments.
 
-https://quiet-coast-66002.herokuapp.com
-
-!!! NSFW !!!
-
-Scraping comments from porn sites, and you can add your comments too
+<img alt="screenshot" src="https://github.com/hliang/porments/raw/master/scrap-screenshoot.png">
 

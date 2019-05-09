@@ -223,3 +223,16 @@ $(document).on("click", "#savenote", function() {
   $("#bodyinput").val("");
 });
 
+
+// scrape button clicked
+$(document).on("click", "#btn-scrape", function() {
+
+  $.ajax({
+    method: "GET",
+    url: "/scrape"
+  })
+    // With that done, add the note information to the page
+    .then(()=>{
+      $("#btn-scrape").text("Yeah! Scraping Done");
+    });
+});
